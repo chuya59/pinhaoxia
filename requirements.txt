@@ -1,0 +1,8 @@
+# 拼好虾 (PingHaoXia) - 核心依赖
+Flask>=2.3.0
+requests>=2.31.0
+
+# 可选：生产环境增强
+# gunicorn>=21.0.0  # WSGI服务器
+# redis>=5.0.0     # 缓存和消息队列
+# sqlalchemy>=2.0.0 # 数据库ORM
