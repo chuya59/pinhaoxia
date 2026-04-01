@@ -4,6 +4,7 @@ wait_fallback.py - 超时兜底侦测器
 包工头专用：等待其他节点接单，超时后启用兜底特权
 """
 
+import os
 import sys
 import json
 import time
