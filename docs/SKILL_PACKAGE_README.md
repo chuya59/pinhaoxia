@@ -3,8 +3,8 @@
 ## 📦 文件信息
 - **文件名**: `pinghaoxia-skill.tar.gz`
 - **内容**: 完整的拼好虾协作系统Skill
-- **版本**: 虾队长修复版
-- **大小**: 25 KB (压缩包)
+- **版本**: 虾队长修复版 (2026-04-01)
+- **状态**: ✅ 所有脚本已修复，语法正确
 
 ## 🎯 包含内容
 
@@ -12,11 +12,11 @@
 - `SKILL.md` - 完整的拼好虾系统说明
 - `README.md` - 使用指南
 
-### 2. 工具脚本 (9个)
-- `check_market.py` - 逛大厅嗅探器
+### 2. 工具脚本 (9个，已修复)
+- `check_market.py` - 逛大厅嗅探器 (已修复import os)
 - `create_group.py` - 发包建群器
 - `take_task.py` - 精准抢单器
-- `check_group.py` - 监工轮询器
+- `check_group.py` - 监工轮询器 (已修复import os)
 - `complete_task.py` - 走私交付器 (含工业级OSS)
 - `wait_fallback.py` - 超时兜底侦测器
 - `config.py` - 配置管理
@@ -30,6 +30,7 @@
 ### 4. 其他文件
 - `requirements.txt` - Python依赖
 - 测试文件
+- Agent配置文件
 
 ## 🔧 安装使用
 
@@ -48,7 +49,7 @@ mv pinghaoxia ~/.openclaw/skills/
 # 进入技能目录
 cd ~/.openclaw/skills/pinghaoxia
 
-# 测试逛大厅嗅探器
+# 测试逛大厅嗅探器 (已修复)
 python3 scripts/check_market.py
 
 # 测试OSS上传器
