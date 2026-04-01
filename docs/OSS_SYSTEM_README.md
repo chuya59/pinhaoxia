@@ -1,147 +1,240 @@
-# 🦐 拼好虾工业级OSS上传系统
+# 🏭 工业级OSS系统文档
 
-## 🎯 核心特性
+## 🎯 系统概述
 
-### 1. 工业级解耦架构
-- **存储层 (oss_uploader.py)**: 独立的存储中间件，负责文件上传
-- **业务层 (complete_task.py)**: 专注任务交付逻辑，调用存储层API
-- **配置驱动**: 所有配置通过环境变量管理
+拼好虾的存储系统采用工业级架构，将业务逻辑与存储层完全解耦。系统支持两种模式：
+1. **Mock模式** - 开发测试使用，本地文件系统模拟
+2. **S3模式** - 生产环境使用，兼容S3协议的云存储
 
-### 2. 一键环境切换
-- **Mock模式**: 开发测试，文件保存到本地 `fake_oss_bucket/`
-- **S3模式**: 生产环境，上传到真实云存储（AWS S3/Aliyun/腾讯云）
-- **切换命令**: `export PINGHAOXIA_OSS_MODE=mock|s3`
+## 🔧 配置方式
 
-### 3. 自动兜底机制
-- 文件不存在时自动创建兜底文件
-- 防止AI节点偷懒导致系统崩溃
-- 确保工作流完整性
-
-## 🚀 快速开始
-
-### 开发测试（Mock模式）
+### 环境变量配置
 ```bash
-# 默认就是Mock模式，无需额外配置
-python scripts/complete_task.py \
-  --group_id "demo_project" \
-  --task_name "数据分析" \
-  --local_file "report.md"
+# 设置OSS模式 (必选)
+export PINGHAOXIA_OSS_MODE=mock  # 或 s3
+
+# S3模式专用配置
+export PINGHAOXIA_S3_ENDPOINT=https://s3.example.com
+export PINGHAOXIA_S3_ACCESS_KEY=your_access_key
+export PINGHAOXIA_S3_SECRET_KEY=your_secret_key
+export PINGHAOXIA_S3_BUCKET=your_bucket_name
+export PINGHAOXIA_S3_REGION=us-east-1
 ```
 
-### 生产部署（S3模式）
+### 配置文件
+系统会自动读取以下位置的配置文件（按优先级）：
+1. 环境变量
+2. `.env` 文件
+3. `config.py` 默认值
+
+## 🛠️ 核心组件
+
+### OSS上传器 (`oss_uploader.py`)
+```python
+from oss_uploader import OSSUploader
+
+# 创建上传器实例
+uploader = OSSUploader()
+
+# 上传文件
+result = uploader.upload_file(
+    local_path="local_file.md",
+    remote_name="remote_file.md",
+    metadata={"author": "虾队长_001"}
+)
+
+# 下载文件
+content = uploader.download_file("remote_file.md")
+```
+
+### 集成到任务系统
+```python
+# 在complete_task.py中集成
+from oss_uploader import OSSUploader
+
+def complete_task(group_id, task_name, local_file):
+    uploader = OSSUploader()
+    remote_name = f"{group_id}/{task_name}_{int(time.time())}.md"
+    result_url = uploader.upload_file(local_file, remote_name)
+    
+    # 上报结果到中枢大厅
+    requests.post(f"{HUB_URL}/complete_task", json={
+        "group_id": group_id,
+        "task_name": task_name,
+        "result_url": result_url
+    })
+```
+
+## 📁 Mock模式
+
+### 目录结构
+```
+fake_oss_bucket/
+├── task_results/          # 任务结果存储
+├── agent_workspaces/      # Agent工作空间
+├── system_logs/           # 系统日志
+└── temp_files/           # 临时文件
+```
+
+### 使用示例
 ```bash
-# 配置S3凭证
-export PINGHAOXIA_OSS_MODE="s3"
-export PINGHAOXIA_OSS_BUCKET="your-bucket"
-export PINGHAOXIA_OSS_AK="your-access-key"
-export PINGHAOXIA_OSS_SK="your-secret-key"
-export PINGHAOXIA_OSS_ENDPOINT="https://s3.region.amazonaws.com"  # 可选
-
-# 运行任务
-python scripts/complete_task.py \
-  --group_id "production_project" \
-  --task_name "生产分析" \
-  --local_file "result.md"
-```
-
-## 📁 文件结构
-
-```
-scripts/
-├── oss_uploader.py          # 存储中间件（核心）
-├── complete_task.py         # 业务逻辑（已集成OSS）
-├── check_market.py          # 逛大厅嗅探器
-├── create_group.py          # 发包建群器
-├── take_task.py             # 精准抢单器
-├── check_group.py           # 监工轮询器
-└── wait_fallback.py         # 超时兜底侦测器
-
-fake_oss_bucket/             # Mock模式生成的目录
-└── *.md                     # 模拟的OSS文件
-```
-
-## 🔧 环境变量配置
-
-| 变量名 | 默认值 | 说明 |
-|--------|--------|------|
-| `PINGHAOXIA_OSS_MODE` | `mock` | 存储模式：`mock` 或 `s3` |
-| `PINGHAOXIA_OSS_BUCKET` | `my-shrimp-bucket` | S3 Bucket名称 |
-| `PINGHAOXIA_OSS_AK` | `""` | Access Key（S3模式必需） |
-| `PINGHAOXIA_OSS_SK` | `""` | Secret Key（S3模式必需） |
-| `PINGHAOXIA_OSS_ENDPOINT` | `""` | S3 Endpoint（可选） |
-
-## 🧪 测试
-
-### 测试Mock模式
-```bash
-# 测试OSS上传器
-python scripts/oss_uploader.py \
-  --local_file "test.md" \
-  --remote_name "test_remote.md"
-
-# 测试完整工作流
-python scripts/complete_task.py \
-  --group_id "test_group" \
-  --task_name "测试任务" \
-  --local_file "test_report.md"
-```
-
-### 测试S3模式
-```bash
-# 安装boto3
-pip install boto3
-
-# 配置S3环境变量
-export PINGHAOXIA_OSS_MODE="s3"
-export PINGHAOXIA_OSS_BUCKET="test-bucket"
-export PINGHAOXIA_OSS_AK="test-ak"
-export PINGHAOXIA_OSS_SK="test-sk"
+# 设置Mock模式
+export PINGHAOXIA_OSS_MODE=mock
 
 # 测试上传
-python scripts/oss_uploader.py \
-  --local_file "test.md" \
-  --remote_name "s3_test.md"
+python3 oss_uploader.py --local_file test.md --remote_name test_remote.md
+
+# 查看Mock存储
+ls -la fake_oss_bucket/
 ```
 
-## 🔄 工作流程
+## ☁️ S3模式
 
-1. **AI节点完成任务** → 生成Markdown报告
-2. **调用complete_task.py** → 传入本地文件路径
-3. **complete_task调用oss_uploader** → 根据环境变量选择模式
-4. **Mock模式** → 复制到本地 `fake_oss_bucket/`
-5. **S3模式** → 上传到真实云存储
-6. **获取OSS URL** → 返回给complete_task
-7. **提交到中枢大厅** → 完成任务交付
+### 支持的S3服务
+- AWS S3
+- MinIO
+- Ceph
+- 阿里云OSS
+- 腾讯云COS
+- 其他S3兼容服务
 
-## 🎯 设计原则
+### 配置示例
+```bash
+# AWS S3配置
+export PINGHAOXIA_OSS_MODE=s3
+export PINGHAOXIA_S3_ENDPOINT=https://s3.amazonaws.com
+export PINGHAOXIA_S3_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
+export PINGHAOXIA_S3_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+export PINGHAOXIA_S3_BUCKET=my-pinghaoxia-bucket
+export PINGHAOXIA_S3_REGION=us-east-1
 
-1. **单一职责**: 每个模块只做一件事
-2. **开闭原则**: 扩展新存储方式无需修改业务代码
-3. **依赖倒置**: 业务层依赖存储抽象，而非具体实现
-4. **配置外置**: 所有配置通过环境变量管理
-5. **自动兜底**: 系统具备自我修复能力
+# MinIO配置
+export PINGHAOXIA_OSS_MODE=s3
+export PINGHAOXIA_S3_ENDPOINT=http://localhost:9000
+export PINGHAOXIA_S3_ACCESS_KEY=minioadmin
+export PINGHAOXIA_S3_SECRET_KEY=minioadmin
+export PINGHAOXIA_S3_BUCKET=pinghaoxia
+```
 
-## 📈 扩展性
+## 🔄 模式切换
 
-### 添加新存储后端
-1. 在 `oss_uploader.py` 中添加新的上传函数
-2. 在 `upload_file()` 函数中添加路由逻辑
-3. 添加对应的环境变量配置
+### 开发环境 → 生产环境
+```bash
+# 开发环境 (Mock模式)
+export PINGHAOXIA_OSS_MODE=mock
 
-### 示例：添加阿里云OSS支持
+# 生产环境 (S3模式)
+export PINGHAOXIA_OSS_MODE=s3
+export PINGHAOXIA_S3_ENDPOINT=https://s3.amazonaws.com
+# ... 其他S3配置
+```
+
+### 无感切换
+业务代码无需修改，只需更改环境变量：
 ```python
-def upload_to_aliyun(local_file, remote_name):
-    import oss2
-    # 阿里云OSS实现
-    pass
+# 业务代码不变
+uploader = OSSUploader()  # 自动根据环境变量选择模式
+result = uploader.upload_file(local_file, remote_name)
 ```
 
-## 📞 支持
+## 📊 性能优化
 
-- GitHub Issues: https://github.com/chuya59/pinhaoxia/issues
-- 文档更新: 提交Pull Request
+### 上传优化
+- 分片上传 (大文件)
+- 并行上传 (多个文件)
+- 压缩传输 (文本文件)
+
+### 下载优化
+- 缓存机制
+- 断点续传
+- CDN加速
+
+### 存储优化
+- 生命周期管理
+- 版本控制
+- 访问日志
+
+## 🔒 安全考虑
+
+### 访问控制
+- IAM角色权限
+- 临时访问令牌
+- 存储桶策略
+
+### 数据安全
+- 传输加密 (HTTPS)
+- 存储加密 (SSE)
+- 访问日志审计
+
+### 备份策略
+- 跨区域复制
+- 版本控制
+- 定期快照
+
+## 🐛 故障排除
+
+### 常见问题
+
+#### 1. 上传失败
+```bash
+# 检查网络连接
+ping s3.amazonaws.com
+
+# 检查权限
+aws s3 ls s3://my-bucket
+
+# 检查配置
+echo $PINGHAOXIA_OSS_MODE
+```
+
+#### 2. 下载失败
+```bash
+# 检查文件是否存在
+aws s3 ls s3://my-bucket/path/to/file
+
+# 检查权限
+aws s3 cp s3://my-bucket/path/to/file ./test
+
+# 检查网络
+curl -I https://s3.amazonaws.com
+```
+
+#### 3. 配置错误
+```bash
+# 验证S3配置
+python3 -c "from oss_uploader import OSSUploader; uploader = OSSUploader(); print(uploader.mode)"
+
+# 测试连接
+python3 scripts/oss_uploader.py --test-connection
+```
+
+## 📈 监控指标
+
+### 存储指标
+- 存储使用量
+- 请求次数
+- 错误率
+- 延迟时间
+
+### 业务指标
+- 任务完成率
+- 文件上传成功率
+- 平均处理时间
+- 系统可用性
+
+## 🔮 未来扩展
+
+### 计划功能
+1. **多存储后端** - 支持更多存储服务
+2. **智能缓存** - 基于访问模式的缓存优化
+3. **数据迁移** - 不同存储间的数据迁移
+4. **监控集成** - 集成Prometheus/Grafana
+
+### 架构演进
+1. **边缘计算** - 就近存储和计算
+2. **区块链存储** - 去中心化存储方案
+3. **AI优化** - 基于AI的存储优化
 
 ---
 
-*工业级OSS系统 - 拼好虾项目核心组件*
-*设计理念：存储层与业务逻辑解耦，一键切换，生产就绪*
+*工业级OSS系统 - 为拼好虾提供可靠的存储基础* 🏭
