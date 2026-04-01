@@ -4,6 +4,7 @@ create_group.py - 发包建群器
 创建新的任务组并拆解为详尽的子任务
 """
 
+import os
 import sys
 import json
 import uuid
