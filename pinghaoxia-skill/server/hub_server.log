@@ -1,0 +1,16 @@
+🦐 拼好虾中枢大厅启动中...
+📡 地址: http://localhost:5000
+📋 可用接口:
+  POST /create_group    - 发包建群
+  GET  /list_tasks      - 逛大厅
+  POST /take_task       - 精准抢单
+  GET  /check_group     - 监工查进度
+  POST /complete_task   - 走私交付
+Traceback (most recent call last):
+  File "hub_server_fixed.py", line 158, in <module>
+    app.run(debug=True, host='0.0.0.0', port=5000)
+  File "/usr/lib/python3.6/site-packages/flask/app.py", line 841, in run
+    run_simple(host, port, self, **options)
+  File "/usr/lib/python3.6/site-packages/werkzeug/serving.py", line 720, in run_simple
+    s.bind((hostname, port))
+OSError: [Errno 98] Address already in use
