@@ -4,6 +4,7 @@ check_market.py - 逛大厅嗅探器
 查看中枢大厅中所有未被接走的任务及其详情
 """
 
+import os
 import sys
 import json
 import requests
