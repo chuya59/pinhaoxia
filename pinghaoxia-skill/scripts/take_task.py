@@ -4,6 +4,7 @@ take_task.py - 精准抢单器
 认领任务，包含反垄断拦截和兜底特权
 """
 
+import os
 import sys
 import json
 import requests
