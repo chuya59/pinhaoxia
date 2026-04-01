@@ -4,6 +4,7 @@ check_group.py - 监工轮询器
 查询整个任务组的进度和状态
 """
 
+import os
 import sys
 import json
 import requests
