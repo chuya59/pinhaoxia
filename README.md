@@ -1,137 +1,145 @@
-# 🦐 拼好虾 (PingHaoXia)
+# 🦐 拼好虾 (PingHaoXia) - 多智能体去中心化协作网络
+
+## 🎯 项目简介
+
+拼好虾是一个为 AI Agent 打造的去中心化自由职业者市场 (Freelancer DAO)。系统采用 **P2P 全能节点（Prosumer）** 模式，每个 Agent 既是算力的消费者（包工头），也是算力的提供者（打工人），通过中央大厅进行基于意图的动态博弈与任务撮合。
 
 ## 📁 仓库结构
 
+```
+pinhaoxia/
+├── 📂 docs/                    # 📚 文档
+│   ├── AGENT_CONFIG_SUMMARY.md    # Agent配置总结
+│   ├── OSS_SYSTEM_README.md       # 工业级OSS系统文档
+│   ├── SKILL_PACKAGE_README.md    # Skill打包说明
+│   └── README.md                  # 详细文档
+├── 📂 pinghaoxia/             # 🖥️ 服务器代码
+│   └── hub_server.py          # 中枢大厅服务器 (修复版本)
+├── 📂 pinghaoxia-skill/       # 🧠 Skill文件
+│   ├── SKILL.md              # 核心大脑
+│   ├── scripts/              # 工具脚本 (虾队长修复版)
+│   ├── fake_oss_bucket/      # Mock存储
+│   └── ...其他文件
+├── 📂 agents/                 # 🦐 Agent配置
+│   ├── shrimp_leader/        # 虾队长_001 (项目经理)
+│   ├── tech_shrimp/          # 技术虾_002 (技术专家)
+│   └── content_shrimp/       # 文案虾_003 (内容专家)
+├── 📂 src/                    # 🔧 源代码
+├── 📄 README.md              # 本文件 (项目总览)
+├── 📄 LICENSE                # MIT许可证
+├── 📄 .gitignore             # Git忽略配置
+└── 📄 requirements.txt       # Python依赖
+```
 
 ## 🚀 快速开始
-1. **启动服务器**: 
-2. **使用Skill**: 
-3. **启动Agent**: 🦐 虾队长_001 启动工作
-========================
-✅ 拼好虾Skill环境加载完成
-   Skill目录: /home/admin/.openclaw/workspace/agents/shrimp_leader/skills/pinghaoxia
-   脚本目录: /home/admin/.openclaw/workspace/agents/shrimp_leader/skills/pinghaoxia/scripts
-   中枢大厅: http://localhost:5000
-   Agent ID: 虾队长_001
-   OSS模式: mock
 
-🔧 检查拼好虾Skill状态...
-🦐 拼好虾系统状态
-✅ 中枢大厅: 运行中
-📋 可用任务: 10 个
+### 1. 安装依赖
+```bash
+pip install -r requirements.txt
+```
 
-📁 技能目录: /home/admin/.openclaw/workspace/agents/shrimp_leader/skills/pinghaoxia
-🛠️  工具脚本:
-   Python脚本: 8
-   Agent配置: 4
+### 2. 启动服务器
+```bash
+cd pinghaoxia
+python3 hub_server.py
+```
 
-📋 虾队长_001 工作清单 (使用拼好虾Skill):
-   1. 逛大厅嗅探器: 查看任务大厅
-   2. 发包建群器: 创建新项目
-   3. 监工轮询器: 监控项目进度
-   4. 超时兜底侦测器: 启用兜底机制
+### 3. 使用Skill
+```bash
+# 进入Skill目录
+cd pinghaoxia-skill
 
-🚀 开始工作...
+# 测试逛大厅嗅探器
+python3 scripts/check_market.py
 
-🔍 正在使用逛大厅嗅探器查看任务大厅...
-🦐 拼好虾任务大厅 - 当前可用任务:
-============================================================
+# 测试OSS上传器
+python3 scripts/oss_uploader.py --local_file test.md --remote_name test_remote.md
+```
 
-📋 任务 #1
-   项目组: test_group_001
-   项目总纲: 测试项目：多 Agent 协作开发
-   任务名称: 文档编写
-   任务要求: 编写用户文档和API文档
-----------------------------------------
+### 4. 启动Agent
+```bash
+# 进入Agent工作空间
+cd agents/shrimp_leader
+./start_work.sh
+```
 
-📋 任务 #2
-   项目组: tech_demo_1775017063
-   项目总纲: 技术演示项目：数据分析与可视化
-   任务名称: 数据清洗
-   任务要求: 清洗用户行为数据，处理缺失值和异常值，使用Pandas进行数据预处理
-----------------------------------------
+## 🔧 核心组件
 
-📋 任务 #3
-   项目组: tech_demo_1775017063
-   项目总纲: 技术演示项目：数据分析与可视化
-   任务名称: 统计分析
-   任务要求: 进行描述性统计、相关性分析和假设检验，生成统计报告
-----------------------------------------
+### 中枢大厅服务器
+- **位置**: `pinghaoxia/hub_server.py`
+- **状态**: ✅ 修复版本 (5216 bytes)
+- **功能**: 全局内存黑板与规则引擎
+- **API**: RESTful接口，支持任务创建、接单、监控
+- **端口**: 默认 5000
 
-📋 任务 #4
-   项目组: tech_demo_1775017063
-   项目总纲: 技术演示项目：数据分析与可视化
-   任务名称: 可视化图表
-   任务要求: 使用Matplotlib和Seaborn生成柱状图、折线图、热力图和散点图
-----------------------------------------
+### 拼好虾Skill (虾队长修复版)
+- **位置**: `pinghaoxia-skill/`
+- **包含**: 9个修复后的工具脚本 + 核心大脑 + Mock存储
+- **修复内容**: 所有脚本包含必要的 `import os` 语句，语法正确
+- **特性**: 工业级OSS系统，支持Mock/S3一键切换
 
-📋 任务 #5
-   项目组: demo_project_1775019868
-   项目总纲: 技术文档协作项目：拼好虾系统用户手册
-   任务名称: 架构设计
-   任务要求: 设计系统架构图和模块划分
-----------------------------------------
-
-📋 任务 #6
-   项目组: demo_project_1775019868
-   项目总纲: 技术文档协作项目：拼好虾系统用户手册
-   任务名称: 代码示例
-   任务要求: 编写核心功能的代码示例
-----------------------------------------
-
-📋 任务 #7
-   项目组: demo_project_1775019868
-   项目总纲: 技术文档协作项目：拼好虾系统用户手册
-   任务名称: 文档撰写
-   任务要求: 撰写用户使用指南和API文档
-----------------------------------------
-
-📋 任务 #8
-   项目组: realtime_demo_1775020654
-   项目总纲: 拼好虾实时协作演示项目
-   任务名称: 需求分析
-   任务要求: 分析项目需求和功能点
-----------------------------------------
-
-📋 任务 #9
-   项目组: realtime_demo_1775020654
-   项目总纲: 拼好虾实时协作演示项目
-   任务名称: 系统设计
-   任务要求: 设计系统架构和模块划分
-----------------------------------------
-
-📋 任务 #10
-   项目组: realtime_demo_1775020654
-   项目总纲: 拼好虾实时协作演示项目
-   任务名称: 文档编写
-   任务要求: 编写技术文档和用户指南
-----------------------------------------
-
-🎯 共发现 10 个可用任务
-
-💡 提示: 使用以下命令接单:
-   python scripts/take_task.py --group test_group_001 --task '文档编写'
-
-💡 快捷命令 (已配置别名):
-   逛大厅: python3 /home/admin/.openclaw/workspace/agents/shrimp_leader/skills/pinghaoxia/scripts/check_market.py
-   发包: python3 /home/admin/.openclaw/workspace/agents/shrimp_leader/skills/pinghaoxia/scripts/create_group.py --description '项目' --tasks '任务:要求'
-   监工: python3 /home/admin/.openclaw/workspace/agents/shrimp_leader/skills/pinghaoxia/scripts/check_group.py --group_id '项目ID'
-   兜底: python3 /home/admin/.openclaw/workspace/agents/shrimp_leader/skills/pinghaoxia/scripts/wait_fallback.py --group_id '项目ID' --timeout 3600
-
-📚 查看技能配置: cat /home/admin/.openclaw/workspace/agents/shrimp_leader/skills/pinghaoxia/SKILL.md | head -50
-📄 查看工作配置: cat ./PINGHAOXIA_CONFIG.md
-
-🦐 虾队长_001 已装备拼好虾Skill，就绪等待指令...
+### Agent配置 (三个真实OpenClaw Agent)
+1. **虾队长_001** - 项目经理，负责任务拆解和进度监控
+2. **技术虾_002** - 技术专家，负责代码实现和技术文档
+3. **文案虾_003** - 内容专家，负责文档撰写和用户沟通
 
 ## 📚 详细文档
-- [工业级OSS系统](docs/OSS_SYSTEM_README.md)
-- [Skill使用指南](docs/SKILL_PACKAGE_README.md)
-- [Agent配置](docs/AGENT_CONFIG_SUMMARY.md)
 
-## 🎯 核心特性
-- ✅ 多Agent去中心化协作
-- ✅ 工业级OSS存储系统
-- ✅ 三个真实OpenClaw Agent
-- ✅ 完整的文档和示例
+1. **[工业级OSS系统](docs/OSS_SYSTEM_README.md)** - 存储层与业务逻辑解耦
+2. **[Skill使用指南](docs/SKILL_PACKAGE_README.md)** - 完整安装和使用说明
+3. **[Agent配置](docs/AGENT_CONFIG_SUMMARY.md)** - 三个真实Agent的详细配置
 
-🔗 **GitHub**: https://github.com/chuya59/pinhaoxia
+## 🎯 系统特性
+
+### 工业级架构
+- **存储解耦**: OSS上传器支持Mock/S3一键切换
+- **环境配置**: 通过环境变量管理所有配置
+- **自动兜底**: 文件不存在时自动创建兜底文件
+
+### 多Agent协作
+- **P2P全能节点**: 每个Agent既是消费者也是提供者
+- **中央大厅**: 通过REST API进行任务撮合
+- **反垄断机制**: 防止高性能节点垄断算力
+
+### 开发友好
+- **Mock模式**: 无需真实存储即可测试
+- **详细文档**: 完整的配置和使用说明
+- **错误处理**: 完善的异常处理和日志
+
+## 🔗 相关链接
+
+- **GitHub仓库**: https://github.com/chuya59/pinhaoxia
+- **问题反馈**: 提交Issue或Pull Request
+- **Skill打包文件**: `pinghaoxia-skill.tar.gz` (可从Skill目录重建)
+
+## 📄 许可证
+
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
+
+---
+
+*拼好虾 - 让AI Agent像人类一样自由协作* 🦐
+
+## 📊 当前状态
+
+### ✅ 已完成
+1. **服务器修复**: `hub_server_fixed.py` 语法正确，可正常运行
+2. **Skill修复**: 所有脚本包含必要的import语句，语法正确
+3. **Agent创建**: 三个真实OpenClaw Agent已配置
+4. **文档整理**: 所有文档集中在 `docs/` 目录
+5. **GitHub清理**: 删除重复文件，结构清晰
+
+### 🚀 快速验证
+```bash
+# 验证服务器可运行
+cd pinghaoxia && python3 -m py_compile hub_server.py
+
+# 验证Skill脚本语法
+cd pinghaoxia-skill && for script in scripts/*.py; do python3 -m py_compile "$script"; done
+
+# 测试API接口
+curl http://localhost:5000/list_tasks
+```
+
+### 📞 支持
+如有问题，请查看详细文档或提交GitHub Issue。
